@@ -42,7 +42,9 @@ Deactivation notes:
 == Frequently Asked Questions ==
 
 = How do I add a redirect? =
+
 General Sequence for a new redirect:
+
 1. Write your post, highlight your anchor (link) text, then click the 'link' button (assuming you're using the Visual Editor).
 2. In the Link URL box, enter the link address without your blog URL, starting with a slash.
 3. Add your other link goodies like 'target' or 'class', click Insert.
