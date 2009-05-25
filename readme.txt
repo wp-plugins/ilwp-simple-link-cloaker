@@ -3,7 +3,7 @@ Contributors: stevejohnson
 Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
 Author URI: http://ilikewordpress.com
 Donate link: http://ilikewordpress.com/donate/
-Tags: redirection, tinyurl, 301, url shortener, url, affiliate link cloaker
+Tags: redirection, 301, url shortener, url, affiliate link cloaker
 Requires at least: 2.7
 Tested up to: 2.7.1
 Stable tag: 1.0
