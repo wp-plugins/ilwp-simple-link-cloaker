@@ -31,7 +31,7 @@
 		Caused by duplicate keys in options
 */
 
-	define( 'SLC_VERSION', 1.0.1 );		
+	define( 'SLC_VERSION', '1.0.1' );		
 	
 	function prepare_insertion( $redirects ) {
 		if ( '' == $redirects )
