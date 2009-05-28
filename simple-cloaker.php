@@ -3,7 +3,7 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.1
+ * Version: 1.2
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
@@ -29,9 +29,23 @@
 		5-28-09, v. 1.1
 		Fixed bug where existing redirects were deleted upon addition of new ones.
 		Caused by duplicate keys in options
+		
+		5-29-09, v. 1.2
+		Fixed redirect to work with multi-value query strings
 */
 
-	define( 'SLC_VERSION', '1.1' );		
+	define( 'SLC_VERSION', '1.2' );
+	
+	function update_version() {
+		$options = get_option('slc_redirect');
+		$options['slc_redirect_version'] = SLC_VERSION;
+		update_option('slc_redirect', $options);
+		
+		## writes updated htaccess rules
+		$redirects = $options['redirects'];
+		$insertion = prepare_insertion( $redirects );
+		write_slc_htaccess( $insertion );
+	}
 	
 	function prepare_insertion( $redirects ) {
 		if ( '' == $redirects )
@@ -43,7 +57,7 @@
 				$from = $redirect['from'];
 			else
 				$from = "/" . $redirect['from'];
-			$insertion[] = "RedirectMatch 302 " . $from . "(.*) " . $redirect['to'] . "$1";
+			$insertion[] = "Redirect 302 " . $from . " " . $redirect['to'];
 		endforeach;
 		return $insertion;
 	}
@@ -59,6 +73,7 @@
 	
 	function slc_redirect_options_page() {
 		global $wpdb;
+		
 		$home_path = get_home_path();
 		$htaccess_file = $home_path.'.htaccess';
 		$blogurl = get_bloginfo('url');
@@ -72,6 +87,12 @@
 			add_option('slc_redirect');
 		
 		$options = get_option('slc_redirect');
+		
+		## handle 1.1 to 1.2 update
+		if ( !isset( $options['slc_redirect_version'] ) ) :
+			update_version();
+			$options = get_option('slc_redirect');
+		endif;
 		
 		## resets stray numeric array keys from last insert
 		if ( isset( $options['redirects'] ) ) :
