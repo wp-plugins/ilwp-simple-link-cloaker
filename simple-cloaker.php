@@ -3,7 +3,7 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.0.1
+ * Version: 1.1
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
@@ -26,12 +26,12 @@
 */
 /* 
 	Changelog:
-		5-28-09, v. 1.0.1
+		5-28-09, v. 1.1
 		Fixed bug where existing redirects were deleted upon addition of new ones.
 		Caused by duplicate keys in options
 */
 
-	define( 'SLC_VERSION', '1.0.1' );		
+	define( 'SLC_VERSION', '1.1' );		
 	
 	function prepare_insertion( $redirects ) {
 		if ( '' == $redirects )
