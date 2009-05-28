@@ -3,7 +3,7 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.0
+ * Version: 1.0.1
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
@@ -24,8 +24,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
+/* 
+	Changelog:
+		5-28-09, v. 1.0.1
+		Fixed bug where existing redirects were deleted upon addition of new ones.
+		Caused by duplicate keys in options
+*/
 
-	define( 'SLC_VERSION', 1.0 );		
+	define( 'SLC_VERSION', 1.0.1 );		
 	
 	function prepare_insertion( $redirects ) {
 		if ( '' == $redirects )
@@ -65,7 +71,15 @@
 		if ( !get_option('slc_redirect') )
 			add_option('slc_redirect');
 		
-		$options = $newoptions = get_option('slc_redirect');
+		$options = get_option('slc_redirect');
+		
+		## resets stray numeric array keys from last insert
+		if ( isset( $options['redirects'] ) ) :
+			sort( $options['redirects'] );
+			update_option('slc_redirect', $options);
+		endif;
+		
+		$newoptions = $options;
 		
 		if ( isset( $_POST['new-redirect-submit'] ) && $_POST['new-redirect-submit'] != '' ) {
 			$new_redirects = $_POST['slc-redirect-new'];
@@ -89,7 +103,6 @@
 				endif;
 			endforeach;
 		}
-		
 
 		if ( $options != $newoptions ) {
 			$options = $newoptions;
@@ -100,6 +113,7 @@
 		}
 
 		if ( $options ) :
+			sort( $options['redirects'] );
 			$redirects = $options['redirects'];
 			$insertion = prepare_insertion( $redirects );
 		endif;
@@ -124,7 +138,7 @@
 			<form method="post" action="">
 				<h3>Add New Cloaked Links</h3>
 			<?php wp_nonce_field('update-options');?>
-				<p><small>The <acronym title="I Like WordPress!">ILWP</acronym> Simple Link Cloaker makes it easy to 'cloak' or hide your affiliate URLs. Using the link cloaker is easy. The left hand box below will contain the 'href' from the link in your post (without the domain name part), the right hand box will contain your affiliate URL. See further instructions and a short video tutorial on the plugin page at <a href="" title="">http://ilikewordpress.com/simple-link-cloaker</a></small></p>
+				<p><small>The <acronym title="I Like WordPress!">ILWP</acronym> Simple Link Cloaker makes it easy to 'cloak' or hide your affiliate URLs. Using the link cloaker is easy. The left hand box below will contain the 'href' from the link in your post (without the domain name part), the right hand box will contain your affiliate URL. See further instructions and a short video tutorial on the plugin page at <a href="http://ilikewordpress.com/simple-link-cloaker/" title="ILWP Simple Link Cloaker">http://ilikewordpress.com/simple-link-cloaker</a></small></p>
 				<table style="clear: none; width: inherit" class="form-table">
 <?php
 $i = 0;

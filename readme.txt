@@ -3,10 +3,10 @@ Contributors: stevejohnson
 Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
 Author URI: http://ilikewordpress.com
 Donate link: http://ilikewordpress.com/donate/
-Tags: redirection, 301, url shortener, url, affiliate link cloaker
+Tags: redirection, tinyurl, 301, url shortener, url, affiliate link cloaker
 Requires at least: 2.7
 Tested up to: 2.7.1
-Stable tag: 1.0
+Stable tag: 1.0.1
 
 A very simple affiliate link 'cloaker' plugin for WordPress blogs. Doesn't do tracking, doesn't tie your shoes, doesn't wipe yer bottom. Just redirects.
 
@@ -42,9 +42,7 @@ Deactivation notes:
 == Frequently Asked Questions ==
 
 = How do I add a redirect? =
-
 General Sequence for a new redirect:
-
 1. Write your post, highlight your anchor (link) text, then click the 'link' button (assuming you're using the Visual Editor).
 2. In the Link URL box, enter the link address without your blog URL, starting with a slash.
 3. Add your other link goodies like 'target' or 'class', click Insert.
