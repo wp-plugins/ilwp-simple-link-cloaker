@@ -134,7 +134,8 @@
 		}
 
 		if ( $options ) :
-			sort( $options['redirects'] );
+			if ( $options['redirects'] )
+				sort( $options['redirects'] );
 			$redirects = $options['redirects'];
 			$insertion = prepare_insertion( $redirects );
 		endif;
