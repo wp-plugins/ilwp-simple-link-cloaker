@@ -207,12 +207,15 @@ endwhile;
 <?php
 		$table = $wpdb->prefix . 'posts';
 		$all_post_slugs = $wpdb->get_results("SELECT post_name FROM $table WHERE post_type = 'post' AND post_status = 'publish'", ARRAY_N);
-		foreach ( $all_post_slugs as $slug ) :
-			$post_slugs[] = $slug[0];
-		endforeach;
+		## on the faint chance that there are no posts, this avoids throwing an error
+		if ( $all_post_slugs ) :
+			foreach ( $all_post_slugs as $slug ) :
+				$post_slugs[] = $slug[0];
+			endforeach;
+		endif; 
 		foreach ( $redirects as $redirect ) :
 			## now check to see if the redirect matches a post slug
-			if ( in_array( trim( $redirect['from'], '/' ), $post_slugs ) )
+			if ( in_array( trim( $redirect['from'], '/' ), $post_slugs ) && $post_slugs )
 				$alert = "class='error'";
 			else
 				$alert = "";
