@@ -5,8 +5,8 @@ Author URI: http://ilikewordpress.com
 Donate link: http://ilikewordpress.com/donate/
 Tags: redirection, tinyurl, 301, url shortener, url, affiliate link cloaker
 Requires at least: 2.7
-Tested up to: 2.7.1
-Stable tag: 1.2
+Tested up to: 2.8
+Stable tag: 1.3
 
 A very simple affiliate link 'cloaker' plugin for WordPress blogs. Doesn't do tracking, doesn't tie your shoes, doesn't wipe yer bottom. Just redirects.
 

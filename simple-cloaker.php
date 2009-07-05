@@ -3,7 +3,7 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.2
+ * Version: 1.3
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
@@ -32,19 +32,27 @@
 		
 		5-29-09, v. 1.2
 		Fixed redirect to work with multi-value query strings
+		
+		7-4-09, v.1.3
+		Fixed slight bug that caused PHP notice on initial installation
+		Fixed PHP warning caused by absence of posts
+		Updated for WP 2.8
 */
 
-	define( 'SLC_VERSION', '1.2' );
+	define( 'SLC_VERSION', '1.3' );
 	
 	function update_version() {
 		$options = get_option('slc_redirect');
 		$options['slc_redirect_version'] = SLC_VERSION;
 		update_option('slc_redirect', $options);
 		
-		## writes updated htaccess rules
-		$redirects = $options['redirects'];
-		$insertion = prepare_insertion( $redirects );
-		write_slc_htaccess( $insertion );
+		## writes updated htaccess rules for
+		## previous installs of v1.1
+		if ( isset( $options['redirects'] ) && $options['slc_redirect_version'] < '1.2' ) {
+			$redirects = $options['redirects'];
+			$insertion = prepare_insertion( $redirects );
+			write_slc_htaccess( $insertion );
+		}
 	}
 	
 	function prepare_insertion( $redirects ) {
@@ -208,6 +216,7 @@ endwhile;
 		$table = $wpdb->prefix . 'posts';
 		$all_post_slugs = $wpdb->get_results("SELECT post_name FROM $table WHERE post_type = 'post' AND post_status = 'publish'", ARRAY_N);
 		## on the faint chance that there are no posts, this avoids throwing an error
+		$post_slugs = array();
 		if ( $all_post_slugs ) :
 			foreach ( $all_post_slugs as $slug ) :
 				$post_slugs[] = $slug[0];
@@ -215,10 +224,12 @@ endwhile;
 		endif; 
 		foreach ( $redirects as $redirect ) :
 			## now check to see if the redirect matches a post slug
-			if ( in_array( trim( $redirect['from'], '/' ), $post_slugs ) && $post_slugs )
-				$alert = "class='error'";
-			else
-				$alert = "";
+			if ( !empty( $post_slugs )) {
+				if ( in_array( trim( $redirect['from'], '/' ), $post_slugs ) )
+					$alert = "class='error'";
+				else
+					$alert = "";
+			}
 ?>
 					<tr>
 						<td><small>from </small><input <?php echo $alert; ?> type="text" name="slc-redirect-manage[<?php echo $i; ?>][from]" value="<?php echo $redirect['from']; ?>" />
