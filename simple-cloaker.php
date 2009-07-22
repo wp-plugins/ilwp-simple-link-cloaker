@@ -3,7 +3,7 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.3
+ * Version: 1.3.1
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
@@ -26,20 +26,25 @@
 */
 /* 
 	Changelog:
-		5-28-09, v. 1.1
-		Fixed bug where existing redirects were deleted upon addition of new ones.
-		Caused by duplicate keys in options
-		
-		5-29-09, v. 1.2
-		Fixed redirect to work with multi-value query strings
+		7-22-09 v 1.3.1
+		Added facility to sanitize entered URL (post) slugs for redirect. Replaces
+		illegal URL chars with -; allows only underscore and dash.
 		
 		7-4-09, v.1.3
 		Fixed slight bug that caused PHP notice on initial installation
 		Fixed PHP warning caused by absence of posts
 		Updated for WP 2.8
+
+		5-29-09, v. 1.2
+		Fixed redirect to work with multi-value query strings
+		
+		5-28-09, v. 1.1
+		Fixed bug where existing redirects were deleted upon addition of new ones.
+		Caused by duplicate keys in options
+		
 */
 
-	define( 'SLC_VERSION', '1.3' );
+	define( 'SLC_VERSION', '1.3.1' );
 	
 	function update_version() {
 		$options = get_option('slc_redirect');
@@ -60,11 +65,10 @@
 			return false;
 		foreach ( $redirects as $redirect ) :
 			## check for beginning slash
-			$slashed = stripos( $redirect['from'], "/" );
-			if ( 0 === $slashed )
-				$from = $redirect['from'];
-			else
-				$from = "/" . $redirect['from'];
+			$from = $redirect['from'];
+			$slashed = stripos( $from, "/" );
+			if ( 0 !== $slashed )
+				$from = "/" . $from;
 			$insertion[] = "Redirect 302 " . $from . " " . $redirect['to'];
 		endforeach;
 		return $insertion;
@@ -109,14 +113,15 @@
 		endif;
 		
 		$newoptions = $options;
-		
+
 		if ( isset( $_POST['new-redirect-submit'] ) && $_POST['new-redirect-submit'] != '' ) {
 			$new_redirects = $_POST['slc-redirect-new'];
 			$i = sizeof( $newoptions['redirects'] );
 			foreach ( $new_redirects as $redirect ) :
 				if ( '/' != $redirect['from'] && '' != $redirect['from'] && '' != $redirect['to'] ) :
 					$i++;
-					$newoptions['redirects'][$i]['from'] = str_replace( $blogurl, '', $redirect['from'] );
+					$from = sanitize_title_with_dashes( str_replace( $blogurl, '', $redirect['from'] ), '', 'link' );
+					$newoptions['redirects'][$i]['from'] = $from;
 					$newoptions['redirects'][$i]['to'] = $redirect['to'];
 				endif;
 			endforeach;
@@ -127,7 +132,7 @@
 			unset( $newoptions['redirects'] );
 			foreach ( $manage_redirects as $key => $redirect ) :
 				if ( '' != $redirect['from'] && '' != $redirect['to'] && '1' != $redirect['delete']) :
-					$newoptions['redirects'][$key]['from'] = $redirect['from'];
+					$newoptions['redirects'][$key]['from'] = sanitize_title_with_dashes( $redirect['from'], '', 'link' );
 					$newoptions['redirects'][$key]['to'] = $redirect['to'];
 				endif;
 			endforeach;
@@ -169,6 +174,7 @@
 				<h3>Add New Cloaked Links</h3>
 			<?php wp_nonce_field('update-options');?>
 				<p><small>The <acronym title="I Like WordPress!">ILWP</acronym> Simple Link Cloaker makes it easy to 'cloak' or hide your affiliate URLs. Using the link cloaker is easy. The left hand box below will contain the 'href' from the link in your post (without the domain name part), the right hand box will contain your affiliate URL. See further instructions and a short video tutorial on the plugin page at <a href="http://ilikewordpress.com/simple-link-cloaker/" title="ILWP Simple Link Cloaker">http://ilikewordpress.com/simple-link-cloaker</a></small></p>
+				<p><strong>Important! </strong>In order to avoid .htaccess errors, the plugin will construct a proper permalink structure for your redirect. Please refer to the center section 'Manage Cloaked Links' to make sure you use the correct form of the permalink within your posts.</p>
 				<table style="clear: none; width: inherit" class="form-table">
 <?php
 $i = 0;
