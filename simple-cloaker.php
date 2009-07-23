@@ -3,7 +3,7 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
@@ -26,6 +26,11 @@
 */
 /* 
 	Changelog:
+		7-23-2009 v 1.3.2
+		Use of WP's sanitize_title_with_dashes filter inadvertently removed slashes
+		within entered redirect slugs. Copied and modified WP's function to preserve
+		entered slashes
+		
 		7-22-09 v 1.3.1
 		Added facility to sanitize entered URL (post) slugs for redirect. Replaces
 		illegal URL chars with -; allows only underscore and dash.
@@ -44,8 +49,47 @@
 		
 */
 
-	define( 'SLC_VERSION', '1.3.1' );
-	
+	define( 'SLC_VERSION', '1.3.2' );
+	/**
+	* Sanitizes title, replacing whitespace with dashes.
+	*
+	* Limits the output to alphanumeric characters, underscore (_) and dash (-).
+	* Whitespace becomes a dash.
+	*
+	* MODIFIED FOR ILWP-COLORED-TAG-CLOUD to allow for slashes within title
+	*
+	* @since 1.2.0
+	*
+	* @param string $title The title to be sanitized.
+	* @return string The sanitized title.
+	*/
+	function ilwp_sanitize_title($title) {
+		$title = strip_tags($title);
+		// Preserve escaped octets.
+		$title = preg_replace('|%([a-fA-F0-9][a-fA-F0-9])|', '---$1---', $title);
+		// Remove percent signs that are not part of an octet.
+		$title = str_replace('%', '', $title);
+		// Restore octets.
+		$title = preg_replace('|---([a-fA-F0-9][a-fA-F0-9])---|', '%$1', $title);
+
+		$title = remove_accents($title);
+		if (seems_utf8($title)) {
+			if (function_exists('mb_strtolower')) {
+				$title = mb_strtolower($title, 'UTF-8');
+			}
+			$title = utf8_uri_encode($title, 200);
+		}
+	 
+		$title = strtolower($title);
+		$title = preg_replace('/&.+?;/', '', $title); // kill entities
+		$title = preg_replace('/[^%\/a-z0-9 _-]/', '', $title);
+		$title = preg_replace('/\s+/', '-', $title);
+		$title = preg_replace('|-+|', '-', $title);
+		$title = trim($title, '-');
+
+		return $title;
+	}
+
 	function update_version() {
 		$options = get_option('slc_redirect');
 		$options['slc_redirect_version'] = SLC_VERSION;
@@ -120,7 +164,7 @@
 			foreach ( $new_redirects as $redirect ) :
 				if ( '/' != $redirect['from'] && '' != $redirect['from'] && '' != $redirect['to'] ) :
 					$i++;
-					$from = sanitize_title_with_dashes( str_replace( $blogurl, '', $redirect['from'] ), '', 'link' );
+					$from = ilwp_sanitize_title( str_replace( $blogurl, '', $redirect['from'] ), '', 'link' );
 					$newoptions['redirects'][$i]['from'] = $from;
 					$newoptions['redirects'][$i]['to'] = $redirect['to'];
 				endif;
@@ -132,7 +176,7 @@
 			unset( $newoptions['redirects'] );
 			foreach ( $manage_redirects as $key => $redirect ) :
 				if ( '' != $redirect['from'] && '' != $redirect['to'] && '1' != $redirect['delete']) :
-					$newoptions['redirects'][$key]['from'] = sanitize_title_with_dashes( $redirect['from'], '', 'link' );
+					$newoptions['redirects'][$key]['from'] = ilwp_sanitize_title( $redirect['from'], '', 'link' );
 					$newoptions['redirects'][$key]['to'] = $redirect['to'];
 				endif;
 			endforeach;
