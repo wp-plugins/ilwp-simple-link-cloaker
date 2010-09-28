@@ -8,7 +8,7 @@ Requires at least: 2.7
 Tested up to: 3.0.1
 Stable tag: trunk
 
-A very simple affiliate link 'cloaker' plugin for WordPress blogs. Doesn't do tracking, doesn't tie your shoes, doesn't wipe yer bottom. Just redirects.
+A very simple affiliate link cloaker plugin for WordPress. Doesn't do tracking, tie your shoes, doesn't do anything but redirects.
 
 == Description ==
 
