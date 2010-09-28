@@ -3,12 +3,12 @@
  * Plugin Name: ILWP Simple Link Cloaker
  * Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
  * Description: Maintains a list of 'cloaked' URLs for redirection to outside URLs
- * Version: 1.3.2
+ * Version: 1.4
  * Author: Steve Johnson
  * Author URI: http://ilikewordpress.com/
  */
 
-/*  Copyright 2009  Steve Johnson  (email : steve@ilikewordpress.com)
+/*  Copyright 2009-2010  Steve Johnson  (email : steve@ilikewordpress.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,11 @@
 */
 /* 
 	Changelog:
+		7-12-2010 v 1.4
+		Added javascript URL validation in an attempt to cut down on htaccess errors
+		that would cause the server to throw 500 Server errors. While the method is not
+		foolproof, it should help.
+		
 		7-23-2009 v 1.3.2
 		Use of WP's sanitize_title_with_dashes filter inadvertently removed slashes
 		within entered redirect slugs. Copied and modified WP's function to preserve
@@ -49,7 +54,9 @@
 		
 */
 
-	define( 'SLC_VERSION', '1.3.2' );
+	define( 'SLC_VERSION', '1.4' );
+	
+	
 	/**
 	* Sanitizes title, replacing whitespace with dashes.
 	*
@@ -112,7 +119,7 @@
 			$from = $redirect['from'];
 			$slashed = stripos( $from, "/" );
 			if ( 0 !== $slashed )
-				$from = "/" . $from;
+				$from = "/" . $from;			
 			$insertion[] = "Redirect 302 " . $from . " " . $redirect['to'];
 		endforeach;
 		return $insertion;
@@ -196,7 +203,28 @@
 			$redirects = $options['redirects'];
 			$insertion = prepare_insertion( $redirects );
 		endif;
+		
+		
+		## due to popular demand and a number
+		## of user problems, the following javascript
+		## attempts to determine if destination URL
+		## contains illegal chars that will cause
+		## 500 Server error and breaking of site
 ?>		
+		<script type="text/javascript">
+		//<![CDATA[
+			function valid_url(x) {
+				var tomatch=new RegExp("(https?)\://[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(:[a-zA-Z0-9]*)?/?([a-zA-Z0-9\-\._\?\,\'/\\\+&amp;%\$#\=~])*");
+				if (tomatch.test(x)) {
+					return true;
+				}
+				else {
+					window.alert("URL appears to be invalid. Try again.");
+					return false; 
+				}
+			}
+		//]]>
+		</script>
 		<div class="wrap">
 			<div style="padding: 10px; border: 1px dotted #ccc; width: 250px; float: right; margin-right: 10px; margin-left: 30px; margin-top: 10px; text-align: center;">
 				<h3>Like <acronym title="I Like WordPress!">ILWP</acronym> Simple Link Cloaker?</h3>
@@ -227,7 +255,7 @@ while ( $i < 3) :
 					<tr valign="top">
 						<td>							
 							<small><?php echo $blogurl; ?></small><input type="text" name="slc-redirect-new[<?php echo $i; ?>][from]" value="/" />
-							<small> to </small><input type="text" name="slc-redirect-new[<?php echo $i; ?>][to]" value="http://" />
+							<small> to </small><input type="text" name="slc-redirect-new[<?php echo $i; ?>][to]" onchange="return valid_url(this.value)" value="http://" />
 						</td>
 					</tr>
 					
@@ -284,7 +312,7 @@ endwhile;
 					<tr>
 						<td><small>from </small><input <?php echo $alert; ?> type="text" name="slc-redirect-manage[<?php echo $i; ?>][from]" value="<?php echo $redirect['from']; ?>" />
 						</td>
-						<td><small> to </small><input type="text" name="slc-redirect-manage[<?php echo $i; ?>][to]" value="<?php echo $redirect['to']; ?>" /></td>
+						<td><small> to </small><input type="text" name="slc-redirect-manage[<?php echo $i; ?>][to]" onchange="return valid_url(this.value)" value="<?php echo $redirect['to']; ?>" /></td>
 						<td><small> delete </small><input type="checkbox" name="slc-redirect-manage[<?php echo $i; ?>][delete]" id="" value="1" /></td>
 					</tr>
 <?php

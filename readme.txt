@@ -1,15 +1,14 @@
-=== Simple Link Cloaker ===
+=== ILWP Simple Link Cloaker ===
 Contributors: stevejohnson
 Plugin URI: http://ilikewordpress.com/simple-link-cloaker/
 Author URI: http://ilikewordpress.com
 Donate link: http://ilikewordpress.com/donate/
 Tags: redirection, tinyurl, 301, url shortener, url, affiliate link cloaker
 Requires at least: 2.7
-Tested up to: 2.8.2
-Stable tag: 1.3.2
+Tested up to: 3.0.1
+Stable tag: trunk
 
 A very simple affiliate link 'cloaker' plugin for WordPress blogs. Doesn't do tracking, doesn't tie your shoes, doesn't wipe yer bottom. Just redirects.
-
 
 == Description ==
 
@@ -18,7 +17,6 @@ Experienced affiliate marketers know the necessity of 'cloaking' outgoing affili
 Enjoy.
 
 If you like the plugin, and it helps you through your affiliate day, a small donation would be welcome and sincerely appreciated. You can donate at http://ilikewordpress.com/donate/. Thank you.
-
 
 == Installation ==
 
@@ -36,8 +34,6 @@ If you like the plugin, and it helps you through your affiliate day, a small don
 
 Deactivation notes:
 *  If you want to deactivate and discontinue use of this plugin, you should click the "Delete All Simple Link Cloaker Redirects" button at the bottom of the options page. This will remove all existing redirects from the .htaccess file and from the WordPress options table. Then deactivate the plugin on the plugins page and remove the files from the plugin folder.
-
-
 
 == Frequently Asked Questions ==
 
@@ -57,6 +53,35 @@ Say you want to redirect the URL "http://myblog.com/recommends/hostgator/" to yo
 
 = What do I use for a link URL? =
 Doesn't matter a whit, as long as you don't use a URL that already exists on your blog. If you do, you're likely to experience unpredictable results, like sending your visitor to a porno site (just kidding). Seriously though, try not to. There're lots of URL variations you can use, your imagination's the limit.
+
+
+== Changelog ==
+= 1.4 =
+* Added javascript URL validation in an attempt to cut down on htaccess errors
+* that would cause the server to throw 500 Server errors. While the method is not
+* foolproof, it should help.
+		
+= 1.3.2 =
+* Use of WP's sanitize_title_with_dashes filter inadvertently removed slashes
+* within entered redirect slugs. Copied and modified WP's function to preserve
+* entered slashes
+		
+= 1.3.1 =
+* Added facility to sanitize entered URL (post) slugs for redirect. Replaces
+* illegal URL chars with -; allows only underscore and dash.
+		
+= 1.3 =
+* Fixed slight bug that caused PHP notice on initial installation
+* Fixed PHP warning caused by absence of posts
+* Updated for WP 2.8
+
+= 1.2 =
+* Fixed redirect to work with multi-value query strings
+		
+= 1.1 =
+* Fixed bug where existing redirects were deleted upon addition of new ones.
+* Caused by duplicate keys in options
+
 
 == Screenshots ==
 1. The Simple Link Cloaker management page in the WordPress Admin.
